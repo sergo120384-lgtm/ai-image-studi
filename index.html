@@ -479,34 +479,34 @@
         });
         
         async function generateImage(apiToken, prompt, model, size, negativePrompt) {
-    const API_URL = `https://cors-anywhere.herokuapp.com/https://api-inference.huggingface.co/models/${model}`;
-
-    const payload = {
-        inputs: prompt,
-        parameters: {
-            negative_prompt: negativePrompt || "ugly, blurry, bad quality",
-            width: size,
-            height: size,
-            num_inference_steps: 30
+            const API_URL = `https://api-inference.huggingface.co/models/${model}`;
+            
+            const payload = {
+                inputs: prompt,
+                parameters: {
+                    negative_prompt: negativePrompt || "ugly, blurry, bad quality",
+                    width: size,
+                    height: size,
+                    num_inference_steps: 30
+                }
+            };
+            
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${apiToken}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+            
+            if (!response.ok) {
+                const error = await response.text();
+                throw new Error(`${response.status}: ${error.substring(0, 100)}`);
+            }
+            
+            return await response.blob();
         }
-    };
-    
-    const response = await fetch(API_URL, {
-        method: 'POST',
-        headers: {
-            'Authorization': `Bearer ${apiToken}`,
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(payload)
-    });
-    
-    if (!response.ok) {
-        const error = await response.text();
-        throw new Error(`${response.status}: ${error.substring(0, 100)}`);
-    }
-    
-    return await response.blob();
-}
         
         // Скачивание
         downloadBtn.addEventListener('click', () => {
